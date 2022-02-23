@@ -8,8 +8,14 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.organization}/${var.service}:*"]
+      values   = ["repo:${github_repository.service.full_name}:*"]
+      # values   = ["repo:${github_repository.service.full_name}:ref:refs/heads/${var.repo_default_branch_name}"]
     }
+    # condition {
+    #   test     = "StringEquals"
+    #   variable = "token.actions.githubusercontent.com:aud"
+    #   values   = ["sts.amazonaws.com"]
+    # }
   }
 }
 
@@ -43,7 +49,7 @@ data "aws_iam_policy_document" "github_actions" {
 
 resource "aws_iam_policy" "github_actions" {
   name        = "github-actions-${var.service}"
-  description = "Grant Github Actions the ability to push to ${var.service} from ${var.organization}/${var.service}"
+  description = "Grant Github Actions the ability to push to ${var.service} ECR repo from ${github_repository.service.full_name} github repo"
   policy      = data.aws_iam_policy_document.github_actions.json
 }
 
