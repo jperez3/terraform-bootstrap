@@ -14,11 +14,6 @@ resource "github_repository" "service" {
   }
 }
 
-resource "github_actions_secret" "aws_account_id" {
-  repository       = github_repository.service.name
-  secret_name      = "AWS_ACCOUNT_ID"
-  plaintext_value  = data.aws_caller_identity.current.account_id
-}
 
 resource "github_actions_secret" "aws_region" {
   repository       = github_repository.service.name
@@ -26,10 +21,16 @@ resource "github_actions_secret" "aws_region" {
   plaintext_value  = data.aws_region.current.name
 }
 
-resource "github_actions_secret" "service" {
+resource "github_actions_secret" "aws_role_arn" {
   repository       = github_repository.service.name
-  secret_name      = "SERVICE"
-  plaintext_value  = var.service
+  secret_name      = "AWS_ROLE_ARN"
+  plaintext_value  = aws_iam_role.github_actions.arn
+}
+
+resource "github_actions_secret" "ecr_repo_url" {
+  repository       = github_repository.service.name
+  secret_name      = "ECR_REPO_URL"
+  plaintext_value  = aws_ecr_repository.service.repository_url
 }
 
 

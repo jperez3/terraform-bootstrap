@@ -6,16 +6,16 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
     }
     condition {
-      test     = "StringLike"
+      test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${github_repository.service.full_name}:*"]
-      # values   = ["repo:${github_repository.service.full_name}:ref:refs/heads/${var.repo_default_branch_name}"]
+      # values   = ["repo:${github_repository.service.full_name}:*"]
+      values   = ["repo:${github_repository.service.full_name}:ref:refs/heads/${var.repo_default_branch_name}"]
     }
-    # condition {
-    #   test     = "StringEquals"
-    #   variable = "token.actions.githubusercontent.com:aud"
-    #   values   = ["sts.amazonaws.com"]
-    # }
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
   }
 }
 
@@ -36,7 +36,7 @@ data "aws_iam_policy_document" "github_actions" {
       "ecr:PutImage",
       "ecr:UploadLayerPart",
     ]
-    resources = [aws_ecr_repository.service[0].arn]
+    resources = [aws_ecr_repository.service.arn]
   }
 
   statement {
