@@ -13,6 +13,6 @@ locals {
   common_tags = {
     Environment = var.env
     Managed-By  = "terraform"
-    Service     = var.srvice
+    Service     = var.service
   }
 }
