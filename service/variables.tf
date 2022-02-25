@@ -14,5 +14,6 @@ locals {
     Environment = var.env
     Managed-By  = "terraform"
     Service     = var.service
+    TF-Module   = "${var.organization}/terraform-bootstrap/service"
   }
 }
