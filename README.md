@@ -1,56 +1,200 @@
 # terraform-bootstrap
 
-
-
 * Example terraform apply output:
 
 ```hcl
 Terraform will perform the following actions:
 
-  # module.mario.aws_ecr_repository.service[0] will be created
+  # module.burrito.data.aws_iam_policy_document.ecr_allow_push will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "ecr_allow_push"  {
+      + id   = (known after apply)
+      + json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "ecr:BatchCheckLayerAvailability",
+              + "ecr:BatchGetImage",
+              + "ecr:CompleteLayerUpload",
+              + "ecr:GetDownloadUrlForLayer",
+              + "ecr:InitiateLayerUpload",
+              + "ecr:PutImage",
+              + "ecr:UploadLayerPart",
+            ]
+          + resources = [
+              + (known after apply),
+            ]
+        }
+      + statement {
+          + actions   = [
+              + "ecr:GetAuthorizationToken",
+            ]
+          + resources = [
+              + "*",
+            ]
+        }
+    }
+
+  # module.burrito.data.aws_iam_policy_document.gha_assume_role_default will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "gha_assume_role_default"  {
+      + id   = (known after apply)
+      + json = (known after apply)
+
+      + statement {
+          + actions = [
+              + "sts:AssumeRoleWithWebIdentity",
+            ]
+
+          + condition {
+              + test     = "StringEquals"
+              + values   = [
+                  + "sts.amazonaws.com",
+                ]
+              + variable = "token.actions.githubusercontent.com:aud"
+            }
+          + condition {
+              + test     = "StringEquals"
+              + values   = [
+                  + (known after apply),
+                ]
+              + variable = "token.actions.githubusercontent.com:sub"
+            }
+
+          + principals {
+              + identifiers = [
+                  + "arn:aws:iam::1234567890:oidc-provider/token.actions.githubusercontent.com",
+                ]
+              + type        = "Federated"
+            }
+        }
+    }
+
+  # module.burrito.aws_ecr_repository.service will be created
   + resource "aws_ecr_repository" "service" {
       + arn                  = (known after apply)
       + id                   = (known after apply)
       + image_tag_mutability = "MUTABLE"
-      + name                 = "mario"
+      + name                 = "burrito"
       + registry_id          = (known after apply)
       + repository_url       = (known after apply)
-      + tags_all             = (known after apply)
+      + tags                 = {
+          + "Environment" = "prod"
+          + "Managed-By"  = "terraform"
+          + "Name"        = "burrito"
+          + "Service"     = "burrito"
+          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
+        }
+      + tags_all             = {
+          + "Environment" = "prod"
+          + "Managed-By"  = "terraform"
+          + "Name"        = "burrito"
+          + "Service"     = "burrito"
+          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
+        }
 
       + image_scanning_configuration {
           + scan_on_push = true
         }
     }
 
-  # module.mario.datadog_monitor.service[0] will be created
-  + resource "datadog_monitor" "service" {
-      + escalation_message  = "Escalation message @pagerduty-mario"
-      + evaluation_delay    = (known after apply)
-      + id                  = (known after apply)
-      + include_tags        = true
-      + message             = "Monitor triggered. Notify: @operations-team"
-      + name                = "basic monitor for mario"
-      + new_host_delay      = 300
-      + notify_audit        = false
-      + notify_no_data      = false
-      + query               = "avg(last_1h):avg:aws.ec2.cpu{environment:prod,host:foo} by {host} > 4"
-      + renotify_interval   = 60
-      + require_full_window = true
-      + tags                = [
-          + "env:prod",
-          + "service:mario",
-        ]
-      + type                = "metric alert"
-
-      + monitor_thresholds {
-          + critical          = "4"
-          + critical_recovery = "3"
-          + warning           = "2"
-          + warning_recovery  = "1"
+  # module.burrito.aws_iam_policy.ecr_allow_push will be created
+  + resource "aws_iam_policy" "ecr_allow_push" {
+      + arn         = (known after apply)
+      + description = (known after apply)
+      + id          = (known after apply)
+      + name        = "github-actions-burrito-ecr-allow-push"
+      + path        = "/"
+      + policy      = (known after apply)
+      + policy_id   = (known after apply)
+      + tags        = {
+          + "Environment" = "prod"
+          + "Managed-By"  = "terraform"
+          + "Name"        = "github-actions-burrito-ecr-allow-push"
+          + "Service"     = "burrito"
+          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
+        }
+      + tags_all    = {
+          + "Environment" = "prod"
+          + "Managed-By"  = "terraform"
+          + "Name"        = "github-actions-burrito-ecr-allow-push"
+          + "Service"     = "burrito"
+          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
         }
     }
 
-  # module.mario.module.repo[0].github_repository.service will be created
+  # module.burrito.aws_iam_role.gha_default will be created
+  + resource "aws_iam_role" "gha_default" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = (known after apply)
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "github-actions-jperez3-burrito-main"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "Environment" = "prod"
+          + "Managed-By"  = "terraform"
+          + "Name"        = "github-actions-jperez3-burrito-main"
+          + "Service"     = "burrito"
+          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
+        }
+      + tags_all              = {
+          + "Environment" = "prod"
+          + "Managed-By"  = "terraform"
+          + "Name"        = "github-actions-jperez3-burrito-main"
+          + "Service"     = "burrito"
+          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy {
+          + name   = (known after apply)
+          + policy = (known after apply)
+        }
+    }
+
+  # module.burrito.aws_iam_role_policy_attachment.gha_default will be created
+  + resource "aws_iam_role_policy_attachment" "gha_default" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "github-actions-jperez3-burrito-main"
+    }
+
+  # module.burrito.github_actions_secret.aws_region will be created
+  + resource "github_actions_secret" "aws_region" {
+      + created_at      = (known after apply)
+      + id              = (known after apply)
+      + plaintext_value = (sensitive value)
+      + repository      = "burrito"
+      + secret_name     = "AWS_REGION"
+      + updated_at      = (known after apply)
+    }
+
+  # module.burrito.github_actions_secret.ecr_repo_url will be created
+  + resource "github_actions_secret" "ecr_repo_url" {
+      + created_at      = (known after apply)
+      + id              = (known after apply)
+      + plaintext_value = (sensitive value)
+      + repository      = "burrito"
+      + secret_name     = "ECR_REPO_URL"
+      + updated_at      = (known after apply)
+    }
+
+  # module.burrito.github_actions_secret.gha_default_role_arn will be created
+  + resource "github_actions_secret" "gha_default_role_arn" {
+      + created_at      = (known after apply)
+      + id              = (known after apply)
+      + plaintext_value = (sensitive value)
+      + repository      = "burrito"
+      + secret_name     = "GHA_DEFAULT_ROLE_ARN"
+      + updated_at      = (known after apply)
+    }
+
+  # module.burrito.github_repository.service will be created
   + resource "github_repository" "service" {
       + allow_auto_merge       = false
       + allow_merge_commit     = true
@@ -60,14 +204,14 @@ Terraform will perform the following actions:
       + branches               = (known after apply)
       + default_branch         = (known after apply)
       + delete_branch_on_merge = false
-      + description            = "github repo for mario"
+      + description            = "github repo for burrito service"
       + etag                   = (known after apply)
       + full_name              = (known after apply)
       + git_clone_url          = (known after apply)
       + html_url               = (known after apply)
       + http_clone_url         = (known after apply)
       + id                     = (known after apply)
-      + name                   = "mario"
+      + name                   = "burrito"
       + node_id                = (known after apply)
       + private                = (known after apply)
       + repo_id                = (known after apply)
@@ -81,5 +225,9 @@ Terraform will perform the following actions:
         }
     }
 
-Plan: 3 to add, 0 to change, 0 to destroy.
+Plan: 8 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + gha_url       = (known after apply)
+  + ssh_clone_url = (known after apply)
 ```
