@@ -1,233 +1,149 @@
-# terraform-bootstrap
+# Containerized Service Bootsrap
 
-* Example terraform apply output:
+### General
+
+* Description: A module to bootstrap the creation of a new containerized service by creating the github repo, an ECR repo, and the necessary IAM resources to allow Github Actions to Upload images to ECR
+* Created By: `jperez3`
+* Module Dependencies:
+  * Github OIDC must be configured in AWS account
+
+* Provider Dependencies:
+  * `aws`
+  * `github`
+* Terraform Version: `1.x`
+* Warning: **THIS IS A PROOF-OF-CONCEPT AND IS SUBJECT TO CHANGE WITHOUT NOTICE, DO NOT USE THIS IN A PRODUCTION ENVIRONMENT**
+
+
+### Pre-Flight
+
+1. You will need to create a github [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with the ability to create and delete repos
+2. You will need to set that personal access token as an environment variable: `export TF_VAR_github_token='YOURPERSONALACCESSTOKENGOESHERE'`
+3. You will need to create and set AWS credentials. Verify with: `aws sts get-caller-identity`
+4. You will need to follow [these awful instructions](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc_verify-thumbprint.html) to get the thumbprint required for the OpenID Connect configuration
+5. You will have to deploy this resource in another workspace in your Terraform AWS environment with the thumbprint you pulled from step 3.:
 
 ```hcl
-Terraform will perform the following actions:
-
-  # module.burrito.data.aws_iam_policy_document.ecr_allow_push will be read during apply
-  # (config refers to values not yet known)
- <= data "aws_iam_policy_document" "ecr_allow_push"  {
-      + id   = (known after apply)
-      + json = (known after apply)
-
-      + statement {
-          + actions   = [
-              + "ecr:BatchCheckLayerAvailability",
-              + "ecr:BatchGetImage",
-              + "ecr:CompleteLayerUpload",
-              + "ecr:GetDownloadUrlForLayer",
-              + "ecr:InitiateLayerUpload",
-              + "ecr:PutImage",
-              + "ecr:UploadLayerPart",
-            ]
-          + resources = [
-              + (known after apply),
-            ]
-        }
-      + statement {
-          + actions   = [
-              + "ecr:GetAuthorizationToken",
-            ]
-          + resources = [
-              + "*",
-            ]
-        }
-    }
-
-  # module.burrito.data.aws_iam_policy_document.gha_assume_role_default will be read during apply
-  # (config refers to values not yet known)
- <= data "aws_iam_policy_document" "gha_assume_role_default"  {
-      + id   = (known after apply)
-      + json = (known after apply)
-
-      + statement {
-          + actions = [
-              + "sts:AssumeRoleWithWebIdentity",
-            ]
-
-          + condition {
-              + test     = "StringEquals"
-              + values   = [
-                  + "sts.amazonaws.com",
-                ]
-              + variable = "token.actions.githubusercontent.com:aud"
-            }
-          + condition {
-              + test     = "StringEquals"
-              + values   = [
-                  + (known after apply),
-                ]
-              + variable = "token.actions.githubusercontent.com:sub"
-            }
-
-          + principals {
-              + identifiers = [
-                  + "arn:aws:iam::1234567890:oidc-provider/token.actions.githubusercontent.com",
-                ]
-              + type        = "Federated"
-            }
-        }
-    }
-
-  # module.burrito.aws_ecr_repository.service will be created
-  + resource "aws_ecr_repository" "service" {
-      + arn                  = (known after apply)
-      + id                   = (known after apply)
-      + image_tag_mutability = "MUTABLE"
-      + name                 = "burrito"
-      + registry_id          = (known after apply)
-      + repository_url       = (known after apply)
-      + tags                 = {
-          + "Environment" = "prod"
-          + "Managed-By"  = "terraform"
-          + "Name"        = "burrito"
-          + "Service"     = "burrito"
-          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
-        }
-      + tags_all             = {
-          + "Environment" = "prod"
-          + "Managed-By"  = "terraform"
-          + "Name"        = "burrito"
-          + "Service"     = "burrito"
-          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
-        }
-
-      + image_scanning_configuration {
-          + scan_on_push = true
-        }
-    }
-
-  # module.burrito.aws_iam_policy.ecr_allow_push will be created
-  + resource "aws_iam_policy" "ecr_allow_push" {
-      + arn         = (known after apply)
-      + description = (known after apply)
-      + id          = (known after apply)
-      + name        = "github-actions-burrito-ecr-allow-push"
-      + path        = "/"
-      + policy      = (known after apply)
-      + policy_id   = (known after apply)
-      + tags        = {
-          + "Environment" = "prod"
-          + "Managed-By"  = "terraform"
-          + "Name"        = "github-actions-burrito-ecr-allow-push"
-          + "Service"     = "burrito"
-          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
-        }
-      + tags_all    = {
-          + "Environment" = "prod"
-          + "Managed-By"  = "terraform"
-          + "Name"        = "github-actions-burrito-ecr-allow-push"
-          + "Service"     = "burrito"
-          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
-        }
-    }
-
-  # module.burrito.aws_iam_role.gha_default will be created
-  + resource "aws_iam_role" "gha_default" {
-      + arn                   = (known after apply)
-      + assume_role_policy    = (known after apply)
-      + create_date           = (known after apply)
-      + force_detach_policies = false
-      + id                    = (known after apply)
-      + managed_policy_arns   = (known after apply)
-      + max_session_duration  = 3600
-      + name                  = "github-actions-jperez3-burrito-main"
-      + name_prefix           = (known after apply)
-      + path                  = "/"
-      + tags                  = {
-          + "Environment" = "prod"
-          + "Managed-By"  = "terraform"
-          + "Name"        = "github-actions-jperez3-burrito-main"
-          + "Service"     = "burrito"
-          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
-        }
-      + tags_all              = {
-          + "Environment" = "prod"
-          + "Managed-By"  = "terraform"
-          + "Name"        = "github-actions-jperez3-burrito-main"
-          + "Service"     = "burrito"
-          + "TF-Module"   = "jperez3/terraform-bootstrap/service"
-        }
-      + unique_id             = (known after apply)
-
-      + inline_policy {
-          + name   = (known after apply)
-          + policy = (known after apply)
-        }
-    }
-
-  # module.burrito.aws_iam_role_policy_attachment.gha_default will be created
-  + resource "aws_iam_role_policy_attachment" "gha_default" {
-      + id         = (known after apply)
-      + policy_arn = (known after apply)
-      + role       = "github-actions-jperez3-burrito-main"
-    }
-
-  # module.burrito.github_actions_secret.aws_region will be created
-  + resource "github_actions_secret" "aws_region" {
-      + created_at      = (known after apply)
-      + id              = (known after apply)
-      + plaintext_value = (sensitive value)
-      + repository      = "burrito"
-      + secret_name     = "AWS_REGION"
-      + updated_at      = (known after apply)
-    }
-
-  # module.burrito.github_actions_secret.ecr_repo_url will be created
-  + resource "github_actions_secret" "ecr_repo_url" {
-      + created_at      = (known after apply)
-      + id              = (known after apply)
-      + plaintext_value = (sensitive value)
-      + repository      = "burrito"
-      + secret_name     = "ECR_REPO_URL"
-      + updated_at      = (known after apply)
-    }
-
-  # module.burrito.github_actions_secret.gha_default_role_arn will be created
-  + resource "github_actions_secret" "gha_default_role_arn" {
-      + created_at      = (known after apply)
-      + id              = (known after apply)
-      + plaintext_value = (sensitive value)
-      + repository      = "burrito"
-      + secret_name     = "GHA_DEFAULT_ROLE_ARN"
-      + updated_at      = (known after apply)
-    }
-
-  # module.burrito.github_repository.service will be created
-  + resource "github_repository" "service" {
-      + allow_auto_merge       = false
-      + allow_merge_commit     = true
-      + allow_rebase_merge     = true
-      + allow_squash_merge     = true
-      + archived               = false
-      + branches               = (known after apply)
-      + default_branch         = (known after apply)
-      + delete_branch_on_merge = false
-      + description            = "github repo for burrito service"
-      + etag                   = (known after apply)
-      + full_name              = (known after apply)
-      + git_clone_url          = (known after apply)
-      + html_url               = (known after apply)
-      + http_clone_url         = (known after apply)
-      + id                     = (known after apply)
-      + name                   = "burrito"
-      + node_id                = (known after apply)
-      + private                = (known after apply)
-      + repo_id                = (known after apply)
-      + ssh_clone_url          = (known after apply)
-      + svn_url                = (known after apply)
-      + visibility             = "public"
-
-      + template {
-          + owner      = "jperez3"
-          + repository = "repo-template-docker"
-        }
-    }
-
-Plan: 8 to add, 0 to change, 0 to destroy.
-
-Changes to Outputs:
-  + gha_url       = (known after apply)
-  + ssh_clone_url = (known after apply)
+resource "aws_iam_openid_connect_provider" "github_actions" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["THUMBPRINTWITHOUTCOLONSGOESHERE"]
+  url             = "https://token.actions.githubusercontent.com"
+}
 ```
+_Note: You only need to create the OpenID Connect Provider resource once per AWS environment_
+
+### Usage
+
+* Terraform (basic example):
+
+`bootstrap.tf`
+```hcl
+module "burrito" {
+  source = "git::git@github.com:jperez3/terraform-bootstrap.git//?ref=service-v1.0.0"
+
+  env     = "prod"
+  service = "burrito"
+}
+
+output "ssh_clone_url" {
+    value = module.burrito.ssh_clone_url
+}
+
+output "gha_url" {
+    value = module.burrito.gha_url
+}
+```
+
+`provider.tf`
+```hcl
+terraform {
+  backend "remote" {
+    organization = "YOURORGNAME"
+
+    workspaces {
+      name = "project-bootstrap-service-burrito"
+    }
+  }
+}
+
+
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 4.2.0"
+    }
+    github = {
+      source  = "integrations/github"
+      version = "~> 4.20.0"
+    }
+  }
+}
+
+
+provider "github" {
+  token = var.github_token
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+```
+
+`variables.tf`
+```hcl
+variable "github_token" {
+    description = "github personal access token"
+}
+```
+
+
+* Terraform (alternate example):
+
+`bootstrap.tf`
+```hcl
+module "burrito" {
+  source = "git::git@github.com:jperez3/terraform-bootstrap.git//?ref=service-v1.0.0"
+
+  env     = "prod"
+  service = "burrito"
+
+  # Alternate github repo to use as template
+  organization  = "tacosporfavor"
+  repo_template = "tamales"
+
+}
+```
+
+### Options
+
+* Description: Input variable options and Outputs for other modules to consume
+
+#### Inputs
+
+| Variable Name | Description                                   | Options                           |  Type  | Required? | Notes |
+| :------------ | :-------------------------------------------- | :-------------------------------- | :----: | :-------: | :---- |
+| env           | unique environment name                       | test/staging/prod                 | string |    Yes    | N/A   |
+| service       | unique service name                           |                                   | string |    Yes    | N/A   |
+| organization  | github organization name (or github username) | (default: `jperez3`)              | string |    No     | N/A   |
+| repo_template | github repo to use as a template              | (default: `repo-template-docker`) | string |    No     | N/A   |
+
+
+#### Outputs
+
+| Variable Name | Description                 |  Type  | Notes |
+| :------------ | :-------------------------- | :----: | :---- |
+| ssh_clone_url | github repo ssh clone url   | string | N/A   |
+| gha_url       | github actions url for repo | string | N/A   |
+
+### Lessons Learned
+
+* Getting the permissions right can be tricky, especially if you don't want to give github actions blanket access to the ECR repo
+* Passing the region/role/ecr-url to github secrets prevents some "fat-fingering" and templatizes the github action workflow
+
+
+### References
+
+* [Using Github Actions OpenID Connect to push to AWS ECR without Credentials](https://blog.tedivm.com/guides/2021/10/github-actions-push-to-aws-ecr-without-credentials-oidc/)
+* [Security harden Github Action deployments to AWS with OIDC](https://www.jerrychang.ca/writing/security-harden-github-actions-deployments-to-aws-with-oidc)
+* [Configuring OpenID Connect in Amazon Web Services](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+* [Obtaining the thumbprint for an OpenID Connect Identity Provider](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc_verify-thumbprint.html)
