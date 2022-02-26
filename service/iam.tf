@@ -27,13 +27,13 @@ data "aws_iam_policy_document" "gha_assume_role_default" {
 }
 
 resource "aws_iam_role" "gha_default" {
-  name               = "github-actions-${var.organization}-${var.service}-${var.repo_default_branch_name}"
+  name               = "${local.name}-${var.repo_default_branch_name}"
   assume_role_policy = data.aws_iam_policy_document.gha_assume_role_default.json
 
   tags = merge(
     local.common_tags,
     tomap({
-      "Name" = "github-actions-${var.organization}-${var.service}-${var.repo_default_branch_name}"
+      "Name" = "${local.name}-${var.repo_default_branch_name}"
     })
   )
 }
@@ -66,14 +66,14 @@ data "aws_iam_policy_document" "ecr_allow_push" {
 }
 
 resource "aws_iam_policy" "ecr_allow_push" {
-  name        = "github-actions-${var.service}-ecr-allow-push"
+  name        = "${local.name}-ecr-allow-push"
   description = "Grant Github Actions the ability to push to ${var.service} ECR repo from ${github_repository.service.full_name} github repo"
   policy      = data.aws_iam_policy_document.ecr_allow_push.json
 
   tags = merge(
     local.common_tags,
     tomap({
-      "Name" = "github-actions-${var.service}-ecr-allow-push"
+      "Name" = "${local.name}-ecr-allow-push"
     })
   )
 }

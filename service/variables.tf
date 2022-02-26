@@ -3,12 +3,13 @@ variable "env" {
 }
 
 variable "service" {
-  description = "unique service name"
+  description = "unique service name which will be applied to the github and ECR repos"
 }
 
 
-
 locals {
+  # Name for AWS resources (gha = github actions)
+  name = "gha-${var.organization}-${var.service}-${var.env}"
 
   common_tags = {
     Environment = var.env

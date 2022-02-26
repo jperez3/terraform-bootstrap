@@ -42,7 +42,6 @@ module "burrito" {
   repo_template = "tamales"
 
 }
-
 ```
 
 ### Options
