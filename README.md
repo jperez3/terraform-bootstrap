@@ -38,7 +38,7 @@ _Note: You only need to create the OpenID Connect Provider resource once per AWS
 `bootstrap.tf`
 ```hcl
 module "burrito" {
-  source = "git::git@github.com:jperez3/terraform-bootstrap.git//?ref=service-v1.0.0"
+  source = "git::git@github.com:jperez3/terraform-bootstrap.git//?ref=v1.0.0"
 
   env     = "prod"
   service = "burrito"
